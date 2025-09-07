@@ -81,8 +81,8 @@ flutter test
 
 <img width="271" height="630" alt="image" src="https://github.com/user-attachments/assets/72082c14-51e7-4937-99bd-0a82cd410184" />
 
-<img width="188" height="426" alt="image" src="https://github.com/user-attachments/assets/9803c83c-db94-4186-8519-871599c89c79" />
-<img width="206" height="467" alt="image" src="https://github.com/user-attachments/assets/c1147ca0-90d9-4df5-87f1-5a1b92eb8fc3" />
+<img width="271" height="630" alt="image" src="https://github.com/user-attachments/assets/9803c83c-db94-4186-8519-871599c89c79" />
+<img width="271" height="630" alt="image" src="https://github.com/user-attachments/assets/c1147ca0-90d9-4df5-87f1-5a1b92eb8fc3" />
 
 
 
