@@ -1,7 +1,19 @@
-build/
+# Flutter & Dart
 .dart_tool/
-.gradle/
+.packages
+.pub-cache/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Build outputs
+build/
 android/app/build/
 ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# IDE files
 *.iml
 .idea/
+.vscode/
