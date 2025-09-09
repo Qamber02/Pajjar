@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../core/csv_utils.dart';
 import '../../core/file_paths.dart';
-import '../../data/repository/word_repository.dart';
+import '../../data/models/word_entry.dart';
 import '../../providers.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -251,27 +252,55 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
+  // FIXED: Export function now uses proper async file paths and generates current data
   Future<void> _exportData(BuildContext context, WidgetRef ref) async {
     try {
-      final jsonPath = FilePaths.getWordsJsonPath();
-      final csvPath = FilePaths.getWordsCsvPath();
+      final repository = ref.read(wordRepositoryProvider);
       
-      final jsonFile = File(jsonPath);
-      final csvFile = File(csvPath);
+      // Ensure we have the latest data
+      if (!repository.isLoaded) {
+        await repository.load();
+      }
       
-      if (!jsonFile.existsSync() || !csvFile.existsSync()) {
+      // Get current words from repository
+      final words = repository.cache;
+      
+      if (words.isEmpty) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data files not found')),
+            const SnackBar(content: Text('No data to export')),
           );
         }
         return;
       }
+
+      // Generate JSON and CSV content using the proper WordEntry method
+      final jsonString = repository.cache.isNotEmpty 
+          ? WordEntry.listToJsonString(repository.cache)
+          : '[]';
+      
+      final csvString = CsvUtils.entriesToCsv(repository.cache);
+
+      // Get file paths using async methods
+      final jsonPath = await FilePaths.wordsJsonPath;
+      final csvPath = await FilePaths.wordsCsvPath;
+      
+      // Write current data to temporary export files
+      final jsonFile = File(jsonPath);
+      final csvFile = File(csvPath);
+      
+      // Ensure directories exist
+      await jsonFile.parent.create(recursive: true);
+      await csvFile.parent.create(recursive: true);
+      
+      // Write the current data
+      await jsonFile.writeAsString(jsonString);
+      await csvFile.writeAsString(csvString);
       
       if (context.mounted) {
         Share.shareXFiles(
           [XFile(jsonPath), XFile(csvPath)],
-          subject: 'Dictionary Data',
+          subject: 'Dictionary Data Export',
         );
       }
     } catch (e) {
@@ -283,44 +312,55 @@ class SettingsPage extends ConsumerWidget {
     }
   }
 
+  // FIXED: Data location now uses proper async file paths
   void _showDataLocation(BuildContext context) async {
-    final jsonPath = FilePaths.getWordsJsonPath();
-    final csvPath = FilePaths.getWordsCsvPath();
-    final backupDir = FilePaths.getBackupDirPath();
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Data Location'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Your dictionary data is stored at:',
-              style: TextStyle(fontWeight: FontWeight.bold),
+    try {
+      final jsonPath = await FilePaths.wordsJsonPath;
+      final csvPath = await FilePaths.wordsCsvPath;
+      final backupDir = await FilePaths.backupsDir;
+      
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Data Location'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Your dictionary data is stored at:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                _buildPathInfo(context, 'Main Data (JSON):', jsonPath),
+                const SizedBox(height: 8),
+                _buildPathInfo(context, 'CSV Mirror:', csvPath),
+                const SizedBox(height: 8),
+                _buildPathInfo(context, 'Backups Directory:', backupDir),
+                const SizedBox(height: 16),
+                const Text(
+                  'Note: On iOS, these files are in the app sandbox. On Android, they are in the app\'s private documents directory.',
+                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            _buildPathInfo(context, 'Main Data (JSON):', jsonPath),
-            const SizedBox(height: 8),
-            _buildPathInfo(context, 'CSV Mirror:', csvPath),
-            const SizedBox(height: 8),
-            _buildPathInfo(context, 'Backups Directory:', backupDir),
-            const SizedBox(height: 16),
-            const Text(
-              'Note: On iOS, these files are in the app sandbox. On Android, they are in the app\'s private documents directory.',
-              style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to get file paths: $e')),
+        );
+      }
+    }
   }
 
   Widget _buildPathInfo(BuildContext context, String label, String path) {
@@ -390,8 +430,6 @@ class _ImportDialogState extends ConsumerState<_ImportDialog> {
       case ImportFormat.text:
         formatName = 'Text';
         break;
-      default:
-        formatName = 'Unknown';
     }
 
     return AlertDialog(
@@ -459,22 +497,31 @@ class _ImportDialogState extends ConsumerState<_ImportDialog> {
   String _getHintText() {
     switch (widget.format) {
       case ImportFormat.json:
-        return '''
-{
-  "words": [
-    {
-      "id": "...",
-      "term": "example",
-      "meaning": "..."
-    }
-  ]
-}
-''';
+        // FIXED: Updated hint to show correct JSON format (array, not object with "words" key)
+        return '''[
+  {
+    "id": "...",
+    "term": "example",
+    "meaning": "a typical case or instance",
+    "phonetic": "/ɪɡˈzæmpəl/",
+    "partOfSpeech": "noun",
+    "examples": ["This is an example"],
+    "synonyms": ["instance"],
+    "antonyms": [],
+    "tags": [],
+    "favorite": false,
+    "createdAtEpoch": 1234567890000,
+    "updatedAtEpoch": 1234567890000,
+    "reviewStage": 0,
+    "nextReviewEpoch": 1234567890000
+  }
+]''';
       case ImportFormat.csv:
-        return '''id,term,meaning,phonetic,...''';
+        return '''id,term,meaning,phonetic,partOfSpeech,examples,synonyms,antonyms,tags,favorite,createdAtEpoch,updatedAtEpoch,reviewStage,nextReviewEpoch
+uuid1,example,a typical case,/ɪɡˈzæmpəl/,noun,This is an example,instance,,tag1,false,1234567890000,1234567890000,0,1234567890000''';
       case ImportFormat.text:
-        return '''term — meaning
-term — meaning
+        return '''example — a typical case or instance
+sample — a small part intended to show what the whole is like
 ...''';
     }
   }
