@@ -18,11 +18,6 @@ class FilePaths {
     return '${dir.path}/words.json';
   }
 
-  /// Synchronous version of wordsJsonPath for direct use
-  static String getWordsJsonPath() {
-    return Directory(Directory.current.path).path + '/words.json';
-  }
-
   /// Path to the temporary JSON file used during atomic writes
   static Future<String> get wordsJsonTempPath async {
     final dir = await _documentsDir;
@@ -35,11 +30,6 @@ class FilePaths {
     return '${dir.path}/words.csv';
   }
 
-  /// Synchronous version of wordsCsvPath for direct use
-  static String getWordsCsvPath() {
-    return Directory(Directory.current.path).path + '/words.csv';
-  }
-
   /// Path to the backups directory
   static Future<String> get backupsDir async {
     final dir = await _documentsDir;
@@ -49,11 +39,6 @@ class FilePaths {
       await directory.create(recursive: true);
     }
     return backupsPath;
-  }
-
-  /// Synchronous version of backupsDir for direct use
-  static String getBackupDirPath() {
-    return Directory(Directory.current.path).path + '/backups';
   }
 
   /// Generates a timestamped backup file path
@@ -72,6 +57,4 @@ class FilePaths {
       await backupDir.create(recursive: true);
     }
   }
-  
-
 }
