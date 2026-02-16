@@ -88,7 +88,7 @@ flutter test
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome!  
 1. Fork the repo  
