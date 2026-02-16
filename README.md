@@ -5,7 +5,7 @@ Built with **Riverpod** for state management and **FlexColorScheme** for elegant
 
 ---
 
-## ✨ Features
+##  Features
 
 - ✅ Offline dictionary support (no internet needed)  
 - 🎨 Beautiful UI with **Material 3** and **FlexColorScheme**  
