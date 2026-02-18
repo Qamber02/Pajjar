@@ -10,7 +10,7 @@ Built with **Riverpod** for state management and **FlexColorScheme** for elegant
 - Offline dictionary support (no internet needed)  
 -  Beautiful UI with **Material 3** and **FlexColorScheme**  
 - 🌓 Light & dark mode with dynamic switching  
-- 🔍 Search functionality for quick word lookup  
+-  Search functionality for quick word lookup  
 - ♿ Accessible with adjustable **text scale factor**  
 - 📱 Cross-platform: Android, iOS, Web, Desktop  
 
