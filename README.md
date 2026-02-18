@@ -11,7 +11,7 @@ Built with **Riverpod** for state management and **FlexColorScheme** for elegant
 -  Beautiful UI with **Material 3** and **FlexColorScheme**  
 -  Light & dark mode with dynamic switching  
 -  Search functionality for quick word lookup  
-- ♿ Accessible with adjustable **text scale factor**  
+- Accessible with adjustable **text scale factor**  
 - 📱 Cross-platform: Android, iOS, Web, Desktop  
 
 ---
