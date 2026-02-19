@@ -16,7 +16,7 @@ Built with **Riverpod** for state management and **FlexColorScheme** for elegant
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 lib/
