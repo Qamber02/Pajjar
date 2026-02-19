@@ -1,4 +1,4 @@
-# Offline Dictionary 📘
+# Offline Dictionary 
 
 A Flutter-based **Offline Dictionary App** that provides a fast, modern, and customizable experience without requiring an internet connection.  
 Built with **Riverpod** for state management and **FlexColorScheme** for elegant light/dark theming.
