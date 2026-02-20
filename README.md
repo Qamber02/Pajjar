@@ -68,7 +68,7 @@ Make sure you have the following installed:
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 Run unit and widget tests:
 ```bash
