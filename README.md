@@ -60,7 +60,7 @@ Make sure you have the following installed:
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 - [Flutter](https://flutter.dev/) – Cross-platform framework  
 - [Riverpod](https://riverpod.dev/) – State management  
