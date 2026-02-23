@@ -106,7 +106,7 @@ Feel free to use and modify it for your own projects.
 
 ---
 
-## 👤 Author
+##  Author
 
 **Qamber02**  
 🔗 [GitHub Profile](https://github.com/Qamber02)
